@@ -1,8 +1,9 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include "overwrite.h"
 
 int main(int argc, char const *argv[]) {
-  printf("written %d\n",overwiteCurrentDir());
+  printf("total written %d\n", overwriteDirectory("/home/quacky/dev/testing_ground/", "meow"));
 
   return 0;
 }

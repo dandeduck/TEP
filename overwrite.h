@@ -1,11 +1,9 @@
 #ifndef HEADER_FILE
 #define HEADER_FILE
 
-int overwiteCurrentDir();
-int overwriteDirectory(char* dirPath);
-int isRegularFile(const char *path);
-int overwriteFile(char* filePath);
-long int findSize(char* fileName);
-void asciiCharacters(char* str);
+int meowDirectoryOverride(char* dirPath, char* overwriteStr);
+int overwriteDirectory(char* dirPath, char* overwriteStr);
+int overwriteFile(char* filePath, char* overwriteStr);
+void asciiCharacters(char** str);
 
 #endif
