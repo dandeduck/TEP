@@ -9,7 +9,10 @@
 
 #define ASCII_MAX 255 - ' '
 
-int isRegularFile(const char *path);
+int overwriteObject(char* dirPath, char* name, char* overwriteStr);
+int isRegularDir(char* name);
+void toPath(char* dir, char* name, char** path);
+int isFile(const char *path);
 long int findSize(char* fileName);
 
 int meowDirectoryOverride(char* dirPath, char* overwriteStr) {
@@ -24,50 +27,54 @@ int overwriteDirectory(char* dirPath, char* overwriteStr) {
 
   d = opendir(dirPath);
 
-
   if(d) {
-    while ((dir = readdir(d)) != NULL) {
-      char* name = dir->d_name;
-      char path[255] = "";
-      strcat(path, dirPath);
-      strcat(path, name);
-      if(strcmp(name, ".") && strcmp(name, "..")) {
-        printf("%s",path);
-        if(isRegularFile(path)) {
-          printf(" FILE\n");
-          int written = overwriteFile(path, overwriteStr);
-          if(written > 0)
-            bytesWritten += written;
-        }
-        else {
-          printf(" DIR\n");
-          strcat(path, "/");
-          bytesWritten += overwriteDirectory(path, overwriteStr);
-        }
-      }
-    }
+    while ((dir = readdir(d)) != NULL)
+      bytesWritten += overwriteObject(dirPath, dir->d_name, overwriteStr);
     closedir(d);
   }
 
   return bytesWritten;
 }
 
-int isRegularFile(const char *path) {
+int overwriteObject(char* dirPath, char* name, char* overwriteStr) {
+  char* path;
+  toPath(dirPath, name, &path);
+
+  if(isRegularDir(name)) {
+    if(isFile(path))
+      return overwriteFile(path, overwriteStr);
+    else {
+      strcat(path, "/");
+      return overwriteDirectory(path, overwriteStr);
+    }
+  }
+  free(path);
+}
+
+int isRegularDir(char* name) {
+  return strcmp(name, ".") && strcmp(name, "..");
+}
+
+void toPath(char* dir, char* name, char** path) {
+  *path = malloc(strlen(dir) + strlen(name)+1);
+  memset(*path,0 , strlen(*path));
+  strcat(*path, dir);
+  strcat(*path, name);
+}
+
+int isFile(const char *path) {
     struct stat path_stat;
     stat(path, &path_stat);
     return S_ISREG(path_stat.st_mode);
 }
 
-//returns the amount of bytes written, -1 if the file couldn't be opened
+//returns the amount of bytes written
 int overwriteFile(char* filePath, char* overwriteStr) {
   FILE *fp;
   long writeSize = findSize(filePath);
-
-  if(writeSize == -1)
-    return -1;
+  int written = 0;
 
   fp = fopen(filePath, "w");
-  int written = 0;
 
   while(writeSize > 0 ) {
     int writeAmount = strlen(overwriteStr) > writeSize ? writeSize : strlen(overwriteStr);
