@@ -1,8 +1,9 @@
 #pragma once
 
 typedef struct GuardParams {
-  void *(*childFunction) (void *);
+  void* (*childFunction)(void *);
   void *arg;
 } GuardParams;
 
-void guard(GuardParams *params);
+void* startGuardThread(void *params);
+void* guard(void *params);
