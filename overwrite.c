@@ -9,7 +9,8 @@
 
 #define ASCII_MAX 255 - ' '
 
-int overwriteObject(char* dirPath, char* name, char* overwriteStr);
+int tryToOverwriteObject(char* dirPath, char* name, char* overwriteStr);
+int overwriteObject(char* path, char* overwriteStr);
 int isRegularDir(char* name);
 void toPath(char* dir, char* name, char** path);
 int isFile(const char *path);
@@ -29,26 +30,31 @@ int overwriteDirectory(char* dirPath, char* overwriteStr) {
 
   if(d) {
     while ((dir = readdir(d)) != NULL)
-      bytesWritten += overwriteObject(dirPath, dir->d_name, overwriteStr);
+      bytesWritten += tryToOverwriteObject(dirPath, dir->d_name, overwriteStr);
     closedir(d);
   }
 
   return bytesWritten;
 }
 
-int overwriteObject(char* dirPath, char* name, char* overwriteStr) {
+int tryToOverwriteObject(char* dirPath, char* name, char* overwriteStr) {
   char* path;
   toPath(dirPath, name, &path);
 
-  if(isRegularDir(name)) {
-    if(isFile(path))
-      return overwriteFile(path, overwriteStr);
-    else {
-      strcat(path, "/");
-      return overwriteDirectory(path, overwriteStr);
-    }
-  }
+  if(isRegularDir(name))
+    return overwriteObject(path, overwriteStr);
+
   free(path);
+  return 0;
+}
+
+int overwriteObject(char* path, char* overwriteStr) {
+  if(isFile(path))
+    return overwriteFile(path, overwriteStr);
+  else {
+    strcat(path, "/");
+    return overwriteDirectory(path, overwriteStr);
+  }
 }
 
 int isRegularDir(char* name) {
@@ -56,7 +62,7 @@ int isRegularDir(char* name) {
 }
 
 void toPath(char* dir, char* name, char** path) {
-  *path = malloc(strlen(dir) + strlen(name)+1);
+  *path = malloc(strlen(dir)+strlen(name)+2);
   memset(*path,0 , strlen(*path));
   strcat(*path, dir);
   strcat(*path, name);
