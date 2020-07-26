@@ -1,11 +1,8 @@
-#ifndef HEADER_FILE
-#define HEADER_FILE
+#pragma once
 
-struct GuardParams {
-  void* (*childFunction) (void *);
+typedef struct GuardParams {
+  void *(*childFunction) (void *);
   void *arg;
-};
+} GuardParams;
 
-void guard(void* (*childFunction)(void *arg), void *arg);
-
-#endif
+void guard(GuardParams *params);

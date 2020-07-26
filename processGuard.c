@@ -4,11 +4,11 @@
 #include <sys/wait.h>
 #include "processGuard.h"
 
-void guard(void* (*childFunction)(void *arg), void *arg) {
+void guard(GuardParams *params) {
   if (!fork())
-    (*childFunction)(arg);
+    (*params->childFunction)(params->arg);
   else {
     wait(NULL);
-    guard(childFunction, arg);
+    guard(params);
   }
 }
