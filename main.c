@@ -1,8 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <sys/wait.h>
 #include <unistd.h>
-#include <pthread.h>
 #include "overwrite.h"
 #include "processGuard.h"
 
@@ -10,23 +8,14 @@ void* func(void* word);
 
 int main(int argc, char const *argv[]) {
   // printf("total written %d\n", overwriteDirectory("/home/quacky/dev/testing_ground/", "meow"));
-  pthread_t thread0;
-  struct GuardParams params;
-  params.childFunction = func;
-  params.arg = "child stuff\n";
-  // void **parameters = malloc(sizeof(&func)*2);
-  // (*parameters)[0] = &func;
-  // (*parameters)[1] = "dick\n";
-  pthread_create(&thread0, NULL, guard, &params);
-  void* returned;
-  pthread_join(thread0, &returned);
-  printf("returned %s\n", (char*)returned);
+  printf("returned %s\n", (char*)startGuardThread(func, "thread stuff\n"));
 
   return 0;
 }
 
 void* func(void* word) {
   printf("%s",(char*)word);
+  sleep(1);
 
   return "gay?";
 }
