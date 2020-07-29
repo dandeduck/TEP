@@ -16,8 +16,9 @@ int main(int argc, char const *argv[]) {
   request_map[1].key = "second gay";
   request_map[1].func = NULL;
   void* (**requests)(void*);
+  size_t request_length;
 
-  add_request("gay", &requests, request_map);
+  add_request("gay", &requests, request_map, &request_length);
   printf("result: %s\n", (char*) requests[0]("gay"));
 
   //pthread_create(&thread0, NULL, guardedFunction, arg);
